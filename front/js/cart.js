@@ -28,7 +28,7 @@ let afficherPanier = function () {
           </div>
         </div>
       </article>`;
-        cardProduct.innerHtml += productAffiche
+        cardProduct.innerHTML += productAffiche
 
     }
 
