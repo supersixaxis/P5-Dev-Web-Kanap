@@ -138,3 +138,19 @@ let arrayProductsInCart = [];
         arrayProductsInCart.push(productAdded);
         localStorage.setItem("products", JSON.stringify(arrayProductsInCart));
       }});
+      *
+
+
+
+      body: JSON.stringify({
+        contact: {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            address: document.getElementById("address").value,
+            city: document.getElementById("city").value,
+            email: document.getElementById("email").value
+            },
+        products : productPanier
+    }),
+
+    <p>Qté : <span id="quantity__ ${productPanier[i]._id}" >${productPanier[i].quantity}</span></p>

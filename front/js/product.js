@@ -43,7 +43,7 @@ let cardProduct = function () {
           color.value = products["colors"][i];
           color.innerHTML = products["colors"][i];
         }
-       
+
       }
     });
 };
@@ -53,7 +53,7 @@ let cardProduct = function () {
 cardProduct()
 
 
- let choixCouleur = document.querySelector("#colors");
+let choixCouleur = document.querySelector("#colors");
 // On écoute ce qu'il se passe dans #colors
 choixCouleur.addEventListener("input", (ec) => {
   let selectColor;
@@ -62,55 +62,56 @@ choixCouleur.addEventListener("input", (ec) => {
 });
 
 
-function addToCart() { 
+function addToCart() {
 
 
-const addToCartBtn = document.getElementById('addToCart');
-    // On récupère l'élément sur lequel on veut détecter le clic
-addToCartBtn.addEventListener('click', () => {
-  // on rappel la variable couleur et on récupère le produit
-  let selectColor = document.querySelector("#colors")
-  if (productsNumber.value > 0 && productsNumber.value < 100) {
-    let productAdded = {
-      name: itemTitle.textContent,
-      color: selectColor.value,
-      price: parseFloat(itemPrice.textContent),
-      quantity: parseFloat(document.querySelector("#quantity").value),
-      _id: productId,
-      imageUrl : document.querySelector(".item__img img " ).src,
-      altTxt : document.querySelector(".item__img img  ").alt,
-    };
-    // on crée le panier 
-    let productPanier = JSON.parse(localStorage.getItem("products"));
-    // on crée un array panier et on ajoute le 1er produit
-    if (productPanier == null) {
+  const addToCartBtn = document.getElementById('addToCart');
+  // On récupère l'élément sur lequel on veut détecter le clic
+  addToCartBtn.addEventListener('click', () => {
+    // on rappel la variable couleur et on récupère le produit
+    let selectColor = document.querySelector("#colors")
+    if (productsNumber.value > 0 && productsNumber.value < 100) {
+      let productAdded = {
+        name: itemTitle.textContent,
+        color: selectColor.value,
+        price: parseFloat(itemPrice.textContent),// faire une requete au serveur pour recuperer le prix a l'endroit ou j'ai besoin qu'il s'affiche
+        quantity: parseFloat(document.querySelector("#quantity").value), 
+        _id: productId,
+        imageUrl: document.querySelector(".item__img img ").src,
+        altTxt: document.querySelector(".item__img img  ").alt,
+      };
+      // on crée le panier 
+      let productPanier = JSON.parse(localStorage.getItem("products"));
+      // on crée un array panier et on ajoute le 1er produit
+      if (productPanier == null) {
 
-      productPanier = [];
-      productPanier.push(productAdded);
-      localStorage.setItem("products", JSON.stringify(productPanier));
-      // si quantité et color sont pareil on ajoute juste la quantité
-    } else {
-      let miseAJourEffectue = false
-      for (let i = 0; i < productPanier.length; i++) {
-        if (productPanier[i]._id === productAdded._id && productPanier[i].color === productAdded.color ){
-          productPanier[i].quantity++        
-          localStorage.setItem("products", JSON.stringify(productPanier))
-          miseAJourEffectue = true
-          break
-        }
-      // si non identique on crée un nouveau produit dans l'array
-      }
-      if (!miseAJourEffectue){
+        productPanier = [];
         productPanier.push(productAdded);
-      localStorage.setItem("products", JSON.stringify(productPanier));
+        localStorage.setItem("products", JSON.stringify(productPanier));
+        // si quantité et color sont pareil on ajoute juste la quantité
+      } else {
+        let miseAJourEffectue = false
+        for (let i = 0; i < productPanier.length; i++) {
+          if (productPanier[i]._id === productAdded._id && productPanier[i].color === productAdded.color) {
+            productPanier[i].quantity++
+            localStorage.setItem("products", JSON.stringify(productPanier))
+            miseAJourEffectue = true
+            break
+          }
+          // si non identique on crée un nouveau produit dans l'array
+        }
+        if (!miseAJourEffectue) {
+          productPanier.push(productAdded);
+          localStorage.setItem("products", JSON.stringify(productPanier));
+        }
+
+
       }
 
-
+      return (productPanier = JSON.parse(localStorage.getItem("products")))
     }
-
-    return (productPanier = JSON.parse(localStorage.getItem("products")))
-  }
-});}
+  });
+}
 
 addToCart()
 
