@@ -16,24 +16,23 @@ let contact = {
 let orderId = productPanier.map(product => product._id);
 console.log(orderId)
 
-// recuperer les prix qui ne sont pas dans le localstorage pour + de sécurité
-fetch(baseUrl + "api/products/")
-.then((response) => response.json())
-.then((products) => {
-  for (let i = 0; i < products.length; i++) {
-    let productPrice = products[i].price;
-  console.log(productPrice);}})
+
 
   //for (let i = 0; i < productsArray.length; i++){}
  // let productPrice = productsArray.map(products => products.price);===> erreur 'not a function'
 //console.log(productPrice) 
-
+let produits = null
 let afficherPanier = function () {
 
-
-
+// recuperer les prix qui ne sont pas dans le localstorage pour + de sécurité
+ fetch(baseUrl + "api/products/")
+.then((response) => response.json())
+.then((products) =>  { 
+  produits = products
+  let html = ""
   let cardProduct = document.getElementById("cart__items")
   for (let i = 0; i < productPanier.length; i++) {
+    const p = produits.filter(el => el._id === productPanier[i]._id )[0]
     const productAffiche = `<article class="cart__item" data-id="${productPanier[i]._id}" data-color="${productPanier[i].color}">
         <div class="cart__item__img">
           <img src="${productPanier[i].imageUrl}" alt="">
@@ -42,11 +41,11 @@ let afficherPanier = function () {
           <div class="cart__item__content__description">
             <h2>${productPanier[i].name}</h2>
             <p>${productPanier[i].color}</p>
-            <p id=price__>${productPanier[i].price * productPanier[i].quantity} €</p>
+            <p id=price__><span id="price__${productPanier[i]._id}${productPanier[i].color}" >${p.price * productPanier[i].quantity}</span> €</p>
           </div>
           <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
-            <p>Qté :<span id="quantity__${productPanier[i]._id}" >${productPanier[i].quantity}</span></p>
+            <p>Qté :<span id="quantity__${productPanier[i]._id}${productPanier[i].color}" >${productPanier[i].quantity}</span></p>
               <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="1" data-id="${productPanier[i]._id}" data-color="${productPanier[i].color}">
             </div>
             <div class="cart__item__content__settings__delete">
@@ -56,22 +55,29 @@ let afficherPanier = function () {
         </div>
       </article>`;
 
+html += productAffiche
 
-    cardProduct.innerHTML += productAffiche
+    
 
   }
-}
+  cardProduct.innerHTML = html
+  totalQuantite()
+  totalPanier()
+  modifyQuantity()
+  supprimerProduit()
+})};
 
 
 
-afficherPanier()
+
+
 
 
 
 
 
 // total quantité
-
+let totalQuantite = function() {
 let quantiteProduit = [];
 
 let totaleArticles = document.getElementById('totalQuantity')
@@ -82,43 +88,68 @@ for (let i = 0; i < productPanier.length; i++) {
   quantiteProduit.push(quantiteProduitPanier)
  // console.log(quantiteProduit)
   // faire la somme des produit recupéré
-  let reducer = (accumulator, currentValue) => accumulator + currentValue
-  let quantiteTotal = quantiteProduit.reduce(reducer,0);
+  
   //console.log(prixTotal)
    // inclure dans le html 
-  totaleArticles.innerHTML = `${quantiteTotal}`
+
+}
+let reducer = (accumulator, currentValue) => accumulator + currentValue
+  let quantiteTotal = quantiteProduit.reduce(reducer,0);
+totaleArticles.innerHTML = `${quantiteTotal}`
 }
 
 
-
 // total panier
-
+let totalPanier = function(){
 let prixTotalCalcul = [];
-
 let totalePanier = document.getElementById('totalPrice')
 // parcourir le tableau
 for (let i = 0; i < productPanier.length; i++) {
-  let prixProduitsDansLePanier = productPanier[i].price;
+  const p = produits.filter(el => el._id === productPanier[i]._id )[0]
+  let prixProduitsDansLePanier = p.price * productPanier[i].quantity;
  // console.log(prixProduitsDansLePanier)
   prixTotalCalcul.push(prixProduitsDansLePanier)
 //  console.log(prixTotalCalcul)
   // faire la somme des produit recupéré
-  let reducer = (accumulator, currentValue) => accumulator + currentValue
-  let prixTotal = prixTotalCalcul.reduce(reducer,0);
-  
-  //console.log(prixTotal)
-   // inclure dans le html 
-  totalePanier.innerHTML = `${prixTotal} ` // * quantite total = not defined
+  // * quantite total = not defined
 
 
 // recuperer l'id
 // requete  pour appeler le prix du produit grace au data id
 
 }
+let reducer = (accumulator, currentValue) => accumulator + currentValue
+let prixTotal = prixTotalCalcul.reduce(reducer,0);
+totalePanier.innerHTML = `${prixTotal} `
+}
+
+//MODIFICATION DE LA QUANTITE 
+let modifyQuantity = function() {
+let inputs = document.querySelectorAll('.itemQuantity');
+inputs.forEach((produit) => {
+  produit.addEventListener("change", () => {
+    let result = document.getElementById('quantity__' + produit.dataset.id + produit.dataset.color)
+    let priceResult = document.getElementById('price__' + produit.dataset.id + produit.dataset.color)
+    let p = productPanier.filter(el => produit.dataset.id === el._id && produit.dataset.color === el.color);
+    p[0].quantity = parseInt(produit.value)
+    result.innerHTML = produit.value;
+    const m = produits.filter(el => el._id === p[0]._id )[0]
+    priceResult.innerHTML = p[0].quantity * m.price 
+    localStorage.setItem("products", JSON.stringify(productPanier));
+    totalPanier()
+    totalQuantite()
+
+    // refaire cette boucle pour mettre a jour le prix
+// appelé la mise a jour du total prix
+
+  })
+})
+
+}
 
 
 /// suppression d'un produit dans le panier
-
+let supprimerProduit = function(){
 let someProduct = []
 // ne pas oublié mise a jour total panier
 // on appel le bouton supprimmer
@@ -130,7 +161,8 @@ supprimerSelection.forEach((produit) => {
     let totalepanier = productPanier.length
     // si y'a un seul produit = on le supprime
     if (totalepanier == 1) {
-
+      productPanier = []
+      afficherPanier()
       return localStorage.removeItem('products')
     }
     // on filtre le tableau pour différencier l'id et la couleur du produit
@@ -142,31 +174,17 @@ supprimerSelection.forEach((produit) => {
       // on met à jour le localstorage après la suppression du produit
       localStorage.setItem("products", JSON.stringify(someProduct));
       // Rafraîchissement de la page
-      location.reload();
+      productPanier = someProduct
+      afficherPanier();
     }
 
   });
 
 })
-
-//MODIFICATION DE LA QUANTITE 
-
-let inputs = document.querySelectorAll('.itemQuantity');
-inputs.forEach((produit) => {
-  produit.addEventListener("change", () => {
-    let result = document.getElementById('quantity__' + produit.dataset.id)
-    let p = productPanier.filter(el => produit.dataset.id != el._id || produit.dataset.color != el.color);
-    p[0].quantity = parseInt(produit.value)
-    result.innerHTML = produit.value;
-    localStorage.setItem("products", JSON.stringify(productPanier));
-  })
-})
-
-// refaire cette boucle pour mettre a jour le prix
-// appelé la mise a jour du total prix
+}
 
 
-
+afficherPanier()
 
 
 
@@ -206,8 +224,8 @@ btnValidate.addEventListener("click", (event) => {
   // formulaire prénom 
   function firstNameValidation() {
 
-    let prenom = contact.firstName.value;
-    if (regExPrenomNomVille(prenom)) {
+    let verif_prenom = document.getElementById('firstName').value;
+    if (regExPrenomNomVille(verif_prenom)) {
       firstName.style.backgroundColor = "green";
       errorFirstName.textContent = "";
       return true;
@@ -226,8 +244,8 @@ btnValidate.addEventListener("click", (event) => {
   let lastName = document.getElementById("lastName")
 
   function lastNameValidation() {
-    let nom = contact.lastName.value;
-    if (regExPrenomNomVille(nom)) {
+    let verif_nom = document.getElementById('lastName').value;
+    if (regExPrenomNomVille(verif_nom)) {
       lastName.style.backgroundColor = "green";
 
       errorLastName.textContent = "";
@@ -247,8 +265,8 @@ btnValidate.addEventListener("click", (event) => {
   let errorAdress = document.getElementById("addressErrorMsg")
 
   function adressValidation() {
-    let adresse = contact.address.value;
-    if (regExAdresse(adresse)) {
+    let verif_adress = document.getElementById('address').value;
+    if (regExAdresse(verif_adress)) {
       adress.style.backgroundColor = "green";
 
       errorAdress.textContent = "";
@@ -268,8 +286,8 @@ btnValidate.addEventListener("click", (event) => {
 
   function cityValidation() {
 
-    let ville = contact.city.value;
-    if (regExPrenomNomVille(ville)) {
+    let verif_ville = document.getElementById('city').value;
+    if (regExPrenomNomVille(verif_ville)) {
       city.style.backgroundColor = "green";
 
       errorCity.textContent = "";
@@ -290,8 +308,8 @@ btnValidate.addEventListener("click", (event) => {
   let errorEmail = document.getElementById("emailErrorMsg")
 
   function emailValidation() {
-    let courriel = contact.email.value;
-    if (regExPrenomNomVille(courriel)) {
+    let verif_email = document.getElementById('email').value;
+    if (regExEmail(verif_email)) {
       email.style.backgroundColor = "green";
 
       errorEmail.textContent = "";

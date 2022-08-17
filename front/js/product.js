@@ -74,7 +74,6 @@ function addToCart() {
       let productAdded = {
         name: itemTitle.textContent,
         color: selectColor.value,
-        price: parseFloat(itemPrice.textContent),// faire une requete au serveur pour recuperer le prix a l'endroit ou j'ai besoin qu'il s'affiche
         quantity: parseFloat(document.querySelector("#quantity").value), 
         _id: productId,
         imageUrl: document.querySelector(".item__img img ").src,
