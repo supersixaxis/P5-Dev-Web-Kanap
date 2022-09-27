@@ -1,11 +1,8 @@
 import { baseUrl } from "./api.js"
 import { productId } from "./api.js";
 
-
-
 const productsNumber = document.getElementById("quantity");
 const itemTitle = document.getElementById('title')
-const itemPrice = document.getElementById('price');
 
 // Je récupère l'id de l'objet choisi
 
@@ -48,8 +45,6 @@ let cardProduct = function () {
     });
 };
 
-
-
 cardProduct()
 
 
@@ -76,8 +71,8 @@ function addToCart() {
         color: selectColor.value,
         quantity: parseFloat(document.querySelector("#quantity").value), 
         _id: productId,
-        imageUrl: document.querySelector(".item__img img ").src,
-        altTxt: document.querySelector(".item__img img  ").alt,
+      //  imageUrl: document.querySelector(".item__img img ").src,
+       // altTxt: document.querySelector(".item__img img  ").alt,
       };
       // on crée le panier 
       let productPanier = JSON.parse(localStorage.getItem("products"));
